@@ -29,7 +29,7 @@ class Pipeline(object):
         ).select(
             F.col("URL"),
             F.explode(F.col("Keywords_array")).alias("key")
-        ).cache()
+        )
         grouped_df = processed_df.groupBy("key").agg(F.collect_list(F.col("URL")
                                                                     ).alias("urls_array")
                                                      ) \
@@ -42,7 +42,8 @@ class Pipeline(object):
                                                            F.size(F.col("keys_array"))
                                                            ).filter(
             (F.col("array_len") > 2) | (F.col("array_len") == 2)) \
-            .drop(F.col("array_len"))
+            .drop(F.col("array_len"))\
+            .cache()
 
         grouped_df.show(truncate=False)
         out_df = grouped_df.withColumn('keys', array_to_string_udf(grouped_df["keys_array"])) \
