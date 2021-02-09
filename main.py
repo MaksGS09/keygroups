@@ -29,6 +29,9 @@ class Pipeline(object):
         ).select(
             F.col("URL"),
             F.explode(F.col("Keywords_array")).alias("key")
+        ).select(
+            F.trim(F.col("URL")).alias("URL"),
+            F.trim(F.col("key")).alias("key")
         )
         grouped_df = processed_df.groupBy("key").agg(F.collect_list(F.col("URL")
                                                                     ).alias("urls_array")
